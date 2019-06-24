@@ -16,12 +16,16 @@ public class MainController {
     private PersonRepository personRepository;
 
     @GetMapping
-    public Iterable<Person> getAllPersons() {
-        return personRepository.findAll();
+    public CustomResponse getAllPersons() {
+        return new CustomResponse(
+                true,
+                null,
+                personRepository.findAll()
+        );
     }
 
     @PostMapping
-    public Person createPerson(
+    public CustomResponse createPerson(
             HttpServletResponse response,
             @RequestParam String firstName,
             @RequestParam String lastName,
@@ -36,25 +40,25 @@ public class MainController {
         personRepository.save(p);
         response.setStatus(201);
         response.setHeader("Location", "/person/"+p.getId());
-        return p;
+        return new CustomResponse(true, null, p);
     }
 
     @GetMapping(path="/{id}")
-    public Person retrievePerson(
+    public CustomResponse retrievePerson(
             HttpServletResponse response,
                 @PathVariable(name="id") Integer id
     ) throws IOException {
         Optional found = personRepository.findById(id);
         if(found.isPresent()) {
             Person p = (Person) found.get();
-            return p;
+            return new CustomResponse(true, null, p);
         }
-        response.sendError(404,"Not found");
-        return null;
+        response.setStatus(404);
+        return new CustomResponse(false, "Not found");
     }
 
     @PutMapping(path="/{id}")
-    public Person updatePerson(
+    public CustomResponse updatePerson(
             HttpServletResponse response,
             @PathVariable(name="id") Integer id,
             @RequestParam String firstName,
@@ -70,14 +74,14 @@ public class MainController {
             p.setEmail(email);
             p.setAge(age);
             personRepository.save(p);
-            return p;
+            return new CustomResponse(true, null, p);
         }
-        response.sendError(404, "Not found");
-        return null;
+        response.setStatus(404);
+        return new CustomResponse(false, "Not found");
     }
 
     @DeleteMapping(path = "/{id}")
-    public Object deletePerson(
+    public CustomResponse deletePerson(
             HttpServletResponse response,
             @PathVariable(name="id") Integer id
     ) throws IOException {
@@ -85,10 +89,10 @@ public class MainController {
         if(found.isPresent()) {
             personRepository.deleteById(id);
             response.setStatus(204);
-            return null;
+            return new CustomResponse(true, null, null);
         } else {
-            response.sendError(404, "Not found");
-            return null;
+            response.setStatus(404);
+            return new CustomResponse(false, "Not found");
         }
     }
 
