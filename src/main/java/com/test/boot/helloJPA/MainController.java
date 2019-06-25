@@ -3,8 +3,10 @@ package com.test.boot.helloJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
@@ -54,7 +56,7 @@ public class MainController {
     public CustomResponse updatePerson(
             HttpServletResponse response,
             @PathVariable(name = "id") Integer id,
-            @RequestBody Person person
+            @Validated @RequestBody Person person
     ) throws IOException {
         Person p = personRepository
                 .findById(id)
@@ -162,6 +164,19 @@ public class MainController {
         phoneRepository.delete(phone);
         response.setStatus(204);
         return new CustomResponse(true, null, null);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public CustomResponse handleValidationExceptions(
+            HttpServletResponse response,
+            MethodArgumentNotValidException e
+    ){
+        response.setStatus(400);
+        return new CustomResponse(
+                false,
+                e.getLocalizedMessage(),
+                e.getBindingResult().getAllErrors()
+        );
     }
 
 

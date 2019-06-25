@@ -38,13 +38,4 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public @ResponseBody CustomResponse springHandleValidationException(
-            Exception e,
-            HttpServletResponse response
-    ) {
-        response.setStatus(500);
-        return new CustomResponse(false, e.getLocalizedMessage());
-    }
-
 }

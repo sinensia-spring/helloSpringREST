@@ -22,6 +22,7 @@ public class Person {
     @Min(value=0)
     @Max(value=99)
     private Integer age;
+    @Pattern(regexp="^view")
     private String company;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "person_id")
