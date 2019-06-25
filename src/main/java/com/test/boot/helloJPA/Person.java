@@ -1,6 +1,7 @@
 package com.test.boot.helloJPA;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
@@ -10,10 +11,18 @@ public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    @NotNull
+    @NotBlank
     private String firstName;
+    @NotNull
+    @NotBlank
     private String lastName;
+    @Email
     private String email;
+    @Min(value=0)
+    @Max(value=99)
     private Integer age;
+    private String company;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "person_id")
     private Collection<Phone> phones = new LinkedHashSet<Phone>();
@@ -58,6 +67,14 @@ public class Person {
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 
     public Collection<Phone> getPhones() {

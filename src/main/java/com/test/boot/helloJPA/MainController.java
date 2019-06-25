@@ -2,6 +2,7 @@ package com.test.boot.helloJPA;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -41,43 +42,30 @@ public class MainController {
     @PostMapping
     public CustomResponse createPerson(
             HttpServletResponse response,
-            @RequestParam String firstName,
-            @RequestParam String lastName,
-            @RequestParam String email,
-            @RequestParam Integer age
+            @Validated @RequestBody Person person
     ) {
-        Person p = new Person();
-        p.setFirstName(firstName);
-        p.setLastName(lastName);
-        p.setEmail(email);
-        p.setAge(age);
-        personRepository.save(p);
+        personRepository.save(person);
         response.setStatus(201);
-        response.setHeader("Location", "/person/" + p.getId());
-        return new CustomResponse(true, null, p);
+        response.setHeader("Location", "/person/" + person.getId());
+        return new CustomResponse(true, null, person);
     }
 
     @PutMapping(path = "/{id}")
     public CustomResponse updatePerson(
             HttpServletResponse response,
             @PathVariable(name = "id") Integer id,
-            @RequestParam String firstName,
-            @RequestParam String lastName,
-            @RequestParam String email,
-            @RequestParam Integer age
+            @RequestBody Person person
     ) throws IOException {
-        Optional found = personRepository.findById(id);
-        if (found.isPresent()) {
-            Person p = (Person) found.get();
-            p.setFirstName(firstName);
-            p.setLastName(lastName);
-            p.setEmail(email);
-            p.setAge(age);
+        Person p = personRepository
+                .findById(id)
+                .orElseThrow(() -> new PersonNotFoundException(id));
+            p.setFirstName(person.getFirstName());
+            p.setLastName(person.getLastName());
+            p.setEmail(person.getEmail());
+            p.setAge(person.getAge());
+            p.setCompany(person.getCompany());
             personRepository.save(p);
             return new CustomResponse(true, null, p);
-        }
-        response.setStatus(404);
-        return new CustomResponse(false, "Not found");
     }
 
     @DeleteMapping(path = "/{id}")
@@ -112,13 +100,9 @@ public class MainController {
     @PostMapping(path = "/{id}/phones")
     public CustomResponse createPhone(
             @PathVariable Integer id,
-            @RequestParam String type,
-            @RequestParam String number
+            @RequestBody Phone phone
     ) {
         Person pp = personRepository.findById(id).get();
-        Phone phone = new Phone();
-        phone.setType(type);
-        phone.setNumber(number);
         phone.setPerson(pp);
         phoneRepository.save(phone);
         return new CustomResponse(true, null, phone);
@@ -148,8 +132,7 @@ public class MainController {
             HttpServletResponse response,
             @PathVariable Integer person_id,
             @PathVariable Integer phone_id,
-            @RequestParam String type,
-            @RequestParam String number
+            @RequestBody Phone p
     ) {
         // TODO: Fill in the blanks
         Person person = personRepository
@@ -158,8 +141,8 @@ public class MainController {
         Phone phone = phoneRepository
                 .findByPersonAndId(person, phone_id)
                 .orElseThrow(()->new PhoneNotFoundException(phone_id));
-        phone.setType(type);
-        phone.setNumber(number);
+        phone.setType(p.getType());
+        phone.setNumber(p.getNumber());
         phoneRepository.save(phone);
         return new CustomResponse(true, null, phone);
     }
