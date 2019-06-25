@@ -1,9 +1,8 @@
 package com.test.boot.helloJPA;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
 
 @Entity
@@ -15,6 +14,15 @@ public class Person {
     private String lastName;
     private String email;
     private Integer age;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "person_id")
+    private Collection<Phone> phones = new LinkedHashSet<Phone>();
+
+    public Person() {}
+
+    public Person(Integer id) {
+        this.id = id;
+    }
 
     public Integer getId() {
         return id;
@@ -52,5 +60,12 @@ public class Person {
         this.age = age;
     }
 
+    public Collection<Phone> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(Collection<Phone> phones) {
+        this.phones = phones;
+    }
 
 }
