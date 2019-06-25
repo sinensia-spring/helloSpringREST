@@ -152,7 +152,16 @@ public class MainController {
             @RequestParam String number
     ) {
         // TODO: Fill in the blanks
-        return null;
+        Person person = personRepository
+                .findById(person_id)
+                .orElseThrow(() -> new PersonNotFoundException(person_id));
+        Phone phone = phoneRepository
+                .findByPersonAndId(person, phone_id)
+                .orElseThrow(()->new PhoneNotFoundException(phone_id));
+        phone.setType(type);
+        phone.setNumber(number);
+        phoneRepository.save(phone);
+        return new CustomResponse(true, null, phone);
     }
 
     @DeleteMapping(path="/{person_id}/phones/{phone_id}")
@@ -161,8 +170,15 @@ public class MainController {
             @PathVariable Integer person_id,
             @PathVariable Integer phone_id
     ) {
-        // TODO: Fill in the blanks
-        return null;
+        Person person = personRepository
+                .findById(person_id)
+                .orElseThrow(() -> new PersonNotFoundException(person_id));
+        Phone phone = phoneRepository
+                .findByPersonAndId(person, phone_id)
+                .orElseThrow(()->new PhoneNotFoundException(phone_id));
+        phoneRepository.delete(phone);
+        response.setStatus(204);
+        return new CustomResponse(true, null, null);
     }
 
 

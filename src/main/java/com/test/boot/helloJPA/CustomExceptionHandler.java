@@ -12,11 +12,27 @@ import java.io.IOException;
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(PersonNotFoundException.class)
-    public @ResponseBody CustomResponse springHandleNotFound(
+    public @ResponseBody CustomResponse springHandlePersonNotFound(
             HttpServletResponse response,
             PersonNotFoundException e
     ) throws IOException {
         response.setStatus(404);
-        return new CustomResponse(false, e.getLocalizedMessage());
+        return new CustomResponse(
+                false,
+                e.getLocalizedMessage()
+        );
     }
+
+    @ExceptionHandler(PhoneNotFoundException.class)
+    public @ResponseBody CustomResponse springHandlePhoneNotFound(
+            HttpServletResponse response,
+            PhoneNotFoundException e
+    ) throws IOException {
+        response.setStatus(404);
+        return new CustomResponse(
+                false,
+                e.getLocalizedMessage()
+        );
+    }
+
 }
